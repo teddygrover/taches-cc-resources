@@ -216,9 +216,9 @@ Two plans require user review before proceeding:
 - Emotion: `SamLowe/roberta-base-go_emotions`
 - Output format: parquet (read by R via `arrow`)
 
-## Thread Reconstruction Note
+## Thread Reconstruction Note — CONFIRMED
 
-Reddit `parent_id` in raw format is `t3_{post_id}` (post parent) or `t1_{comment_id}` (comment parent). The `parsedParentId` column in the user's data may already have the `t1_`/`t3_` prefix stripped — this MUST be confirmed before implementing Plan 01-03, as the stripping logic in the plan (`gsub("^t[0-9]+_", "", parent_id)`) would be a no-op on already-clean IDs but could corrupt IDs if they use a different format.
+`parsedParentId` is already a bare ID (no `t3_/t1_` prefixes). The prefix-stripping step in Plan 01-03 (`gsub("^t[0-9]+_", "", parent_id)`) must NOT be applied to `parsedParentId` — use it directly as the join key. The `parentId` (raw) column retains the prefixes but should be ignored in favour of `parsedParentId`.
 </critical_context>
 
 <current_state>
@@ -235,22 +235,24 @@ Reddit `parent_id` in raw format is `t3_{post_id}` (post parent) or `t1_{comment
 | renv.lock | Does not exist |
 | Any processed data | Does not exist |
 
-## Open Questions Requiring Resolution Before Plan 01-02 Execution
+## Open Questions — ALL RESOLVED
 
-1. **What are the actual `dataType` values?** The plan normalises to "post"/"comment" but we don't know what strings appear in the column. Could be "link"/"comment", "post"/"comment", or something else entirely. A `table(df$dataType)` on a sample would answer this.
+All three schema questions have been confirmed by the user:
 
-2. **What is the `parsedParentId` format?** Is it a bare ID like `abc123`, or does it retain prefixes like `t3_abc123`? This determines whether the prefix-stripping in Plan 01-03 is needed.
+1. ~~What are the actual `dataType` values?~~ **CONFIRMED: exactly `"post"` or `"comment"` — matches plan assumptions exactly.**
+2. ~~What is the `parsedParentId` format?~~ **CONFIRMED: bare ID, no `t3_/t1_` prefixes — do NOT apply prefix stripping.**
+3. ~~Does `createdAt` serve both posts and comments?~~ **CONFIRMED: yes, `createdAt` is reliable for all record types.**
 
-3. **Does `createdAt` already contain both post and comment timestamps?** Or do posts use `createdAt` and comments use `commentCreatedAt`? (The simplest assumption — use `createdAt` as primary — is likely correct but should be verified.)
+**No blocking questions remain. Implementation can proceed immediately from Plan 01-01.**
 
 ## Next Action for Implementing Agent
 
 1. Read this file to restore context
 2. Note the schema mapping table in `<critical_context>` — this supersedes the generic column matching in the plan files
-3. Proceed to execute Plan 01-01 (`01-01-PLAN.md`) — no data or schema questions needed for this step
+3. Execute Plan 01-01 (`01-01-PLAN.md`) — creates folder structure, installs packages, creates config
 4. After 01-01: instruct user to copy their CSVs to `data/raw/`
-5. Before executing 01-02: implement `load_reddit_data()` using the actual column names above, NOT the generic matching in the plan
-6. For 01-03: check `parsedParentId` format before deciding whether to strip prefixes
+5. Execute Plan 01-02 — implement `load_reddit_data()` using exact column names from schema table; no flexible guessing needed
+6. Execute Plan 01-03 — use `parsedParentId` directly as join key; skip all prefix-stripping logic
 
 ## Branch
 All commits must go to: `claude/copy-commands-config-401ek`
