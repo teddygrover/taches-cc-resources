@@ -3,7 +3,7 @@ Plan and prepare to implement an end-to-end R pipeline for filtering, classifyin
 </original_task>
 
 <work_completed>
-## Planning Artifacts Created (prior session — commit 5d7a467)
+## Planning Artifacts Created (commit 5d7a467)
 
 All planning documents exist and are committed to branch `claude/copy-commands-config-401ek`:
 
@@ -15,7 +15,20 @@ All planning documents exist and are committed to branch `claude/copy-commands-c
   - Phase 03: `03-01` through `03-02` (Transformer Inference)
   - Phase 04: `04-01` through `04-05` (Shiny Dashboard)
 
-## Schema Information Obtained (this session)
+## Schema Questions Resolved (commit ae2a56c)
+
+All three open schema questions were confirmed by the user and written into this handoff document.
+
+## Environment/Tooling Clarification (most recent session — no code changes)
+
+- Confirmed `--dangerouslyDisableSandbox` is a CLI flag only, not a persistent setting — nothing to reverse
+- User is on a **secure work network with admin restrictions** — cannot install or run Claude Code CLI from their work computer
+- Claude Code + VS Code integration is blocked for the same reason (network/admin permissions)
+- The **Claude.ai web interface** is the correct tool for work sessions
+- User plans to switch to **Claude Code CLI with `--dangerouslyDisableSandbox`** when working from home, which will allow direct R execution, package installs, and full filesystem access
+- No project files were modified this session
+
+## Schema Information Obtained (prior session)
 
 The user provided the actual column names from their Reddit CSVs. All files share an identical schema. This information is NOT yet written into any plan files — it exists only in this conversation. Key mappings confirmed:
 
@@ -132,6 +145,12 @@ No implementation has been attempted yet — all 13 plans are 100% pending.
 - **Remote**: `origin/claude/copy-commands-config-401ek` (up to date)
 - **Git status**: Clean — nothing uncommitted
 
+## Execution Environment
+- **Work sessions**: Claude.ai web interface only (no CLI, no VS Code — blocked by secure network/admin restrictions)
+- **Home sessions**: Claude Code CLI with `--dangerouslyDisableSandbox` — full R execution, renv installs, direct filesystem access
+- **Implication**: Plan 01-01 (R project setup, renv install, package install) **must be run from home** using the CLI. Web sessions can edit plan files, review schemas, and answer questions, but cannot execute R scripts.
+- **CLI setup at home**: `npm install -g @anthropic-ai/claude-code`, then `claude --dangerouslyDisableSandbox` from the project root
+
 ## Schema Mapping Reference (CRITICAL — not in any file yet)
 
 ```
@@ -247,12 +266,15 @@ All three schema questions have been confirmed by the user:
 
 ## Next Action for Implementing Agent
 
+**IMPORTANT — Run from home CLI session only (requires R execution):**
+
 1. Read this file to restore context
 2. Note the schema mapping table in `<critical_context>` — this supersedes the generic column matching in the plan files
-3. Execute Plan 01-01 (`01-01-PLAN.md`) — creates folder structure, installs packages, creates config
-4. After 01-01: instruct user to copy their CSVs to `data/raw/`
-5. Execute Plan 01-02 — implement `load_reddit_data()` using exact column names from schema table; no flexible guessing needed
-6. Execute Plan 01-03 — use `parsedParentId` directly as join key; skip all prefix-stripping logic
+3. Note the execution environment: R scripts must be run with `--dangerouslyDisableSandbox` from the Claude Code CLI
+4. Execute Plan 01-01 (`01-01-PLAN.md`) — creates folder structure, installs packages via renv, creates config
+5. After 01-01: instruct user to copy their CSVs to `data/raw/`
+6. Execute Plan 01-02 — implement `load_reddit_data()` using exact column names from schema table; no flexible guessing needed
+7. Execute Plan 01-03 — use `parsedParentId` directly as join key; skip all prefix-stripping logic
 
 ## Branch
 All commits must go to: `claude/copy-commands-config-401ek`
