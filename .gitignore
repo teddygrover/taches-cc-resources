@@ -1,0 +1,32 @@
+# R environment
+.Renviron
+.Rhistory
+.RData
+.Rproj.user
+
+# Config with secrets
+config/config.R
+
+# Data files (large, not committed)
+data/raw/*
+data/processed/*
+data/checkpoints/*
+
+# Keep directory structure
+!data/raw/.gitkeep
+!data/processed/.gitkeep
+!data/checkpoints/.gitkeep
+
+# renv library (local packages — not committed)
+renv/library/
+renv/staging/
+renv/sandbox/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+
+# OS
+.DS_Store
+Thumbs.db
