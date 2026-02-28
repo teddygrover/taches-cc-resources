@@ -1,0 +1,27 @@
+# Secrets and local config
+.Renviron
+config/secrets.R
+config/config.R
+
+# Data files (large; not committed)
+data/raw/*
+data/processed/*
+data/checkpoints/*
+!data/raw/.gitkeep
+!data/processed/.gitkeep
+!data/checkpoints/.gitkeep
+
+# renv cache (library itself is not committed; renv.lock is)
+renv/library/
+renv/staging/
+renv/sandbox/
+
+# R session artefacts
+.Rhistory
+.RData
+.Rproj.user/
+*.Rproj
+
+# OS artefacts
+.DS_Store
+Thumbs.db
