@@ -19,7 +19,17 @@ All planning documents exist and are committed to branch `claude/copy-commands-c
 
 All three open schema questions were confirmed by the user and written into this handoff document.
 
-## Environment/Tooling Clarification (most recent session — no code changes)
+## Schema Correction: createdAt Posts-Only (most recent session)
+
+- **Correction**: `createdAt` is populated for posts only — it is `NA` for all comments. The prior session incorrectly confirmed it was reliable for all record types.
+- **Impact on date filtering** (01-02-PLAN.md updated): Cannot simply filter all records on `createdAt >= 2020`. Instead:
+  1. Filter posts by `createdAt >= 2020-01-01` → set of `valid_post_ids`
+  2. Keep posts in that set; keep comments whose `post_id` (`parsedPostId`) is in that set
+  3. Comments with no matching valid post are dropped
+- **Impact on 01-03-PLAN.md**: Minor cleanup — removed the erroneous prefix-stripping step; confirmed `post_id` (`parsedPostId`) gives direct `thread_id` without chain-walking.
+- **Files updated**: `01-02-PLAN.md`, `01-03-PLAN.md`, `whats-next.md`
+
+## Environment/Tooling Clarification (prior session — no code changes)
 
 - Confirmed `--dangerouslyDisableSandbox` is a CLI flag only, not a persistent setting — nothing to reverse
 - User is on a **secure work network with admin restrictions** — cannot install or run Claude Code CLI from their work computer
@@ -160,7 +170,7 @@ id                    → id (raw)
 parsedId              → id (preferred — use this)
 body                  → text                       Both posts and comments
 title                 → title                      Posts only; NA for comments
-createdAt             → created_at                 Primary timestamp (POSIXct)
+createdAt             → created_at                 Posts only — NA for all comments
 commentCreatedAt      → (secondary; may differ)    Comment-specific; use createdAt as primary
 dataType              → type                       Values unknown — check before coding
 parentId              → parent_id (raw)
@@ -260,7 +270,7 @@ All three schema questions have been confirmed by the user:
 
 1. ~~What are the actual `dataType` values?~~ **CONFIRMED: exactly `"post"` or `"comment"` — matches plan assumptions exactly.**
 2. ~~What is the `parsedParentId` format?~~ **CONFIRMED: bare ID, no `t3_/t1_` prefixes — do NOT apply prefix stripping.**
-3. ~~Does `createdAt` serve both posts and comments?~~ **CONFIRMED: yes, `createdAt` is reliable for all record types.**
+3. ~~Does `createdAt` serve both posts and comments?~~ **CORRECTED: `createdAt` is populated for posts only — it is NA for all comments. Date filtering must be post-based: keep posts where `createdAt >= 2020-01-01`, then keep comments whose `parsedPostId` links to a valid (post-2020) post. Comments with no valid parent post are also dropped.**
 
 **No blocking questions remain. Implementation can proceed immediately from Plan 01-01.**
 
