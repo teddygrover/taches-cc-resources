@@ -20,6 +20,11 @@ if (!requireNamespace("renv", quietly = TRUE)) {
 cat("Initialising renv project library...\n")
 renv::init(bare = TRUE)   # bare = TRUE: initialise without auto-installing discovered packages
 
+# Install 'here' first — it is sourced at the top level of utils.R and
+# config files, so it must be present before any other script runs.
+cat("Installing 'here' (required before all other scripts)...\n")
+renv::install("here")
+
 # ── 2. Install required packages ─────────────────────────────────────────────
 cat("\nInstalling project packages (this may take several minutes)...\n")
 
